@@ -29,7 +29,7 @@ function clearImage(){
 }
 
 function getQueryParams() {
-    var qs =  window.location.search.split("+").join(" ");
+    var qs =  window.location.search.replace("+", " ");
 
     var params = {}, tokens,
         re = /[?&]?([^=]+)=([^&]*)/g;
@@ -44,5 +44,13 @@ function getQueryParams() {
 
 
 function connectToServer(){
-    // TODO connect to the socket.io server
+    var socket = io();
+    socket.emit("connect-screen", devicename);
+    socket.on("remote-disconnected", function () {
+        clearImage();
+    });
+    socket.on("display-image", function (index) {
+        console.log("displaying image: " + index);
+        showImage(index);
+    });
 }

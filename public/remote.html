@@ -2,6 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    <script src="/socket.io/socket.io.js"></script>
     <script src="script/remote.js"></script>
     <link rel="stylesheet" href="style/fontawesome/css/font-awesome.css">
     <link rel="stylesheet" href="style/pure/pure-min.css">
@@ -9,15 +10,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery Remote Control</title>
 </head>
-
+<body>
 <button class="pure-button" id="toggleMenu">
     <i class="fa fa-cog"></i>
     Settings
 </button>
 <div id="menu">
     <ul>
-TODO list the devices here
-
     </ul>
 </div>
 <div id="gallery">
