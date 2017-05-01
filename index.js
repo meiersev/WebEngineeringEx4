@@ -31,6 +31,7 @@ io.on("connection", function(socket) {
                     calcImageIndex(remote.image, getNumberOfConnectedScreens(remote) - 1));
             } else {
                 screen.socket.emit("remote-disconnected");
+                setImageOnScreens(socket.id, remote.image);
             }
         });
         // handle event that the remote picked a new image.
@@ -196,8 +197,8 @@ function setImageOnScreens(remoteSocketId, index) {
         if (screenObj.connected) {
             var screen = getScreen(screenObj.id, "id");
             screen.socket.emit("display-image", calcImageIndex(index, offset));
+            ++offset;
         }
-        ++offset;
     });
 }
 
