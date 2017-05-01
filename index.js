@@ -26,19 +26,19 @@ io.on("connection", function(socket) {
             var screen = getScreen(screenName, "name");
             var remote = getRemote(socket.id);
             var connected = toggleRemoteScreenConnection(remote, screen);
-            if (connected) {
-                screen.socket.emit("display-image",
-                    calcImageIndex(remote.image, getNumberOfConnectedScreens(remote) - 1));
+            if (connected) {		
+				setImageOnScreens(getRemote(socket.id));
+                //screen.socket.emit("display-image", remote.image + remote.numberOfConnections);
             } else {
                 screen.socket.emit("remote-disconnected");
-                setImageOnScreens(socket.id, remote.image);
+				setImageOnScreens(getRemote(socket.id));
             }
         });
         // handle event that the remote picked a new image.
         socket.on("remote-pick-image", function (index) {
             var remote = getRemote(socket.id);
             remote.image = index;
-            setImageOnScreens(socket.id, index);
+            setImageOnScreens(getRemote(socket.id));
         });
         // handle disconnection of the remote.
         socket.on("disconnect", function() {
@@ -55,6 +55,11 @@ io.on("connection", function(socket) {
         socket.on("disconnect", function() {
             console.log("disconnected screen " + screenName);
             removeScreen(socket.id);
+			// That unfortunately does not work because socket.id 
+			// is not initialized at this point
+			// setImageOnScreens(socket.id);
+			// Instead I used this hack, updating all remotes:
+			setImageOnAllScreens();
         });
     });
 });
@@ -182,6 +187,10 @@ function toggleRemoteScreenConnection(remote, screen) {
 /** Send the names of all the screens in the system to a remote.
  */
 function initRemoteWithScreens(remoteSocket) {
+	// Initialize number of connected screens to zero
+	//var remote = getRemote(remoteSocket.id);
+	//remote.numberOfConnections = 0;
+	
     var screenNames = screens.map(function (s) {
         return s.name;
     });
@@ -190,28 +199,23 @@ function initRemoteWithScreens(remoteSocket) {
 
 /** Set an image on all screens connected to given remote and index of the selected image.
  */
-function setImageOnScreens(remoteSocketId, index) {
-    var remote = getRemote(remoteSocketId);
-    var offset = 0;
-    remote.screens.forEach(function (screenObj) {
-        if (screenObj.connected) {
-            var screen = getScreen(screenObj.id, "id");
-            screen.socket.emit("display-image", calcImageIndex(index, offset));
-            ++offset;
-        }
-    });
+function setImageOnScreens(remote) {
+	index = remote.image;
+	var imageIndexShift = 0;
+	remote.screens.forEach(function (screenObj) {
+		if (screenObj.connected) {
+			var screen = getScreen(screenObj.id, "id");
+			// Attention: This could exceed the array index and 
+			// 	          must be handled on the client's side
+			screen.socket.emit("display-image", index + imageIndexShift);
+			imageIndexShift++; 
+		}
+	})
 }
 
-/** Calculate an index from a starting index plus an offset. Returns a number between 0 and imageCount.
- */
-function calcImageIndex(index, offset) {
-    return (index + offset) % imageCount;
-}
-
-/** Given a remote object, count the number of connected screens.
- */
-function getNumberOfConnectedScreens(remote) {
-    return remote.screens.filter(function (screenObj) {
-        return screenObj.connected;
-    }).length;
+function setImageOnAllScreens(){
+	for (var i = 0; i < remotes.length; i++) {
+		remote = remotes[i];
+		setImageOnScreens(remote);
+	}
 }

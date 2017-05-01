@@ -50,7 +50,7 @@ function connectToServer(){
         clearImage();
     });
     socket.on("display-image", function (index) {
-        console.log("displaying image: " + index);
-        showImage(index);
+        console.log("displaying image: " + index % imageCount);
+        showImage(index % imageCount);
     });
 }
