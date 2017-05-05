@@ -41,14 +41,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.querySelector('#toggleMenu').addEventListener("click", function(){
         var style = document.querySelector('#menu').style;
-        style.display = style.display == "none" || style.display == ""  ? "block" : "none";
+        style.display = style.display == "none" || style.display == "" ? "block" : "none";
     });
     connectToServer();
 });
 
 function connectToServer() {
-    // TODO connect to the socket.io server
-
     socket.emit("connect-remote");
     socket.on("init-remote-with-screens", function (screenNames) {
         screenNames.forEach(function (s) {
@@ -86,10 +84,8 @@ function addScreenToList(name) {
             console.log(screen);
             screen.connected = !screen.connected;
             if (!screen.connected) {
-                console.log(1);
                 button.innerHTML = CONNECT_STR;
             } else {
-                console.log(2);
                 button.innerHTML = DISCONNECT_STR;
             }
             socket.emit("toggle-screen-connection", screenName);
@@ -101,7 +97,7 @@ function addScreenToList(name) {
 }
 
 function removeScreenFromList(name) {
-    screens.filter(function (element) {
+    screens = screens.filter(function (element) {
         return element.name != name;
     });
 

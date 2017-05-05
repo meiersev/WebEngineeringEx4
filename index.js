@@ -1,5 +1,3 @@
-var imageCount = 7; // the maximum number of images available
-
 var express = require("express");
 var app = express();
 var http = require("http").Server(app);
@@ -166,7 +164,6 @@ function removeScreenFromRemotesList(id) {
         for (var i = 0; i < remote.screens.length; ++i) {
             if (remote.screens[i].id == id) {
                 remote.screens.splice(i, 1);
-                break;
             }
         }
     })
@@ -200,7 +197,7 @@ function initRemoteWithScreens(remoteSocket) {
 /** Set an image on all screens connected to given remote and index of the selected image.
  */
 function setImageOnScreens(remote) {
-	index = remote.image;
+	var index = remote.image;
 	var imageIndexShift = 0;
 	remote.screens.forEach(function (screenObj) {
 		if (screenObj.connected) {
@@ -210,12 +207,12 @@ function setImageOnScreens(remote) {
 			screen.socket.emit("display-image", index + imageIndexShift);
 			imageIndexShift++; 
 		}
-	})
+	});
 }
 
 function setImageOnAllScreens(){
 	for (var i = 0; i < remotes.length; i++) {
-		remote = remotes[i];
+		var remote = remotes[i];
 		setImageOnScreens(remote);
 	}
 }
