@@ -24,6 +24,7 @@ function initialiseGallery() {
     for (i = 0; i < imageCount; i++) {
         img = document.createElement("img");
         img.src = "images/" +i +".jpg";
+		img.id = "image_" + i;
         document.body.appendChild(img);
         var handler = (function(index) {
             return function() {
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
         var style = document.querySelector('#menu').style;
         style.display = style.display == "none" || style.display == "" ? "block" : "none";
     });
+	initialiseDeviceMotion();
     connectToServer();
 });
 
@@ -109,3 +111,56 @@ function removeScreenFromList(name) {
         }
     }
 }
+
+/*
+ * Exercise 4.2
+ */
+var lastEvent;
+function initialiseDeviceMotion() {
+	if (window.DeviceMotionEvent) {
+		lastEvent = new Date().getTime();
+		document.getElementById("dmEvent").innerHTML = "Device motions are supported."
+		window.addEventListener('devicemotion', deviceMotionHandler, false);
+	} else {
+		document.getElementById("dmEvent").innerHTML = "Device motions are not supported."
+	}
+}
+/* Available data:
+ *	  eventData.acceleration.{x,y,z}
+ *	  eventData.accelerationIncludingGravity.{x,y,z}
+ *	  eventData.rotationRate.{alpha,beta,gamma}
+ */
+function deviceMotionHandler(eventData) {
+    var jerkThreshold = 15.0;
+	var interval = 300;
+	var d = new Date();
+	if (lastEvent + interval < d.getTime() ) {
+		if(eventData.acceleration.x > jerkThreshold){
+			lastEvent = d.getTime();
+			id = "image_" + ((currentImage + 1)%imageCount);
+			eventFire(document.getElementById(id), 'click');
+			//alert("Clicked " + id);
+		}
+		else if(eventData.acceleration.x < -jerkThreshold){
+			lastEvent = d.getTime();
+			id = "image_" + ((currentImage + imageCount - 1)%imageCount);
+			eventFire(document.getElementById(id), 'click');
+			//alert("Clicked " + id);
+		}
+	}
+}
+
+/*
+ * Simulates a click
+ * copy-pasted from: http://stackoverflow.com/questions/2705583/how-to-simulate-a-click-with-javascript
+ */
+function eventFire(el, etype){
+  if (el.fireEvent) {
+    el.fireEvent('on' + etype);
+  } else {
+    var evObj = document.createEvent('Events');
+    evObj.initEvent(etype, true, false);
+    el.dispatchEvent(evObj);
+  }
+}
+ 
