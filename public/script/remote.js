@@ -45,6 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
         style.display = style.display == "none" || style.display == "" ? "block" : "none";
     });
 	initialiseDeviceMotion();
+    initialiseDeviceOrientation();
     connectToServer();
 });
 
@@ -125,6 +126,29 @@ function initialiseDeviceMotion() {
 		document.getElementById("dmEvent").innerHTML = "Device motions are not supported."
 	}
 }
+
+function initialiseDeviceOrientation() {
+	if (window.DeviceOrientationEvent) {
+		document.getElementById("doEvent").innerHTML = "Device orientations are supported."
+		window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+	} else {
+		document.getElementById("doEvent").innerHTML = "Device orientations are not supported."
+	}
+}
+
+function deviceOrientationHandler(eventData){
+    var range =  (eventData.beta / 10) | 0
+    if (range>= 2){
+        range = 2
+    }
+    if (range <= -2){
+        range = -2
+    }
+
+    document.getElementById("doEvent").innerHTML = range
+}
+
+
 /* Available data:
  *	  eventData.acceleration.{x,y,z}
  *	  eventData.accelerationIncludingGravity.{x,y,z}
