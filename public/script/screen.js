@@ -28,6 +28,12 @@ function clearImage(){
     msg.style.display = 'block';
 }
 
+function setZoom(level){
+    var scale_num = ((level + 2) / 4.0) + 0.5;
+    var img = document.querySelector('#image');
+    img.style.transform = "scale(" + scale_num + ")";
+}
+
 function getQueryParams() {
     var qs =  window.location.search.replace("+", " ");
 
@@ -52,5 +58,8 @@ function connectToServer(){
     socket.on("display-image", function (index) {
         console.log("displaying image: " + index % imageCount);
         showImage(index % imageCount);
+    });
+    socket.on("set-zoom", function(level){
+        setZoom(level);
     });
 }

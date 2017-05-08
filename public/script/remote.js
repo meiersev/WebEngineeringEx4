@@ -116,10 +116,13 @@ function removeScreenFromList(name) {
 /*
  * Exercise 4.2
  */
-var lastEvent;
+var lastJerkEvent;
+var lastOrientationEvent;
+var lastOrientaionLevel;
+
 function initialiseDeviceMotion() {
 	if (window.DeviceMotionEvent) {
-		lastEvent = new Date().getTime();
+		lastJerkEvent = new Date().getTime();
 		document.getElementById("dmEvent").innerHTML = "Device motions are supported."
 		window.addEventListener('devicemotion', deviceMotionHandler, false);
 	} else {
@@ -129,6 +132,8 @@ function initialiseDeviceMotion() {
 
 function initialiseDeviceOrientation() {
 	if (window.DeviceOrientationEvent) {
+		lastOrientationEvent = new Date().getTime();
+        lastOrientaionLevel  = 0;
 		document.getElementById("doEvent").innerHTML = "Device orientations are supported."
 		window.addEventListener('deviceorientation', deviceOrientationHandler, false);
 	} else {
@@ -137,15 +142,24 @@ function initialiseDeviceOrientation() {
 }
 
 function deviceOrientationHandler(eventData){
-    var range =  (eventData.beta / 10) | 0
-    if (range>= 2){
-        range = 2
-    }
-    if (range <= -2){
-        range = -2
-    }
+	var interval = 300;
+	var d = new Date();
+    var range =  (eventData.beta / 30) | 0;
+        if (range>= 2){
+            range = 2;
+        }
+        if (range <= -2){
+            range = -2;
+        }
 
-    document.getElementById("doEvent").innerHTML = range
+	if (lastOrientationEvent + interval < d.getTime() && 
+            lastOrientaionLevel != range ) {
+        lastOrientationEvent = d.getTime();
+        lastOrientaionLevel = range;
+
+        socket.emit("zoomLevel", range);
+        document.getElementById("doEvent").innerHTML = range;
+    }
 }
 
 
@@ -158,15 +172,15 @@ function deviceMotionHandler(eventData) {
     var jerkThreshold = 15.0;
 	var interval = 300;
 	var d = new Date();
-	if (lastEvent + interval < d.getTime() ) {
+	if (lastJerkEvent + interval < d.getTime() ) {
 		if(eventData.acceleration.x > jerkThreshold){
-			lastEvent = d.getTime();
+			lastJerkEvent = d.getTime();
 			id = "image_" + ((currentImage + 1)%imageCount);
 			eventFire(document.getElementById(id), 'click');
 			//alert("Clicked " + id);
 		}
 		else if(eventData.acceleration.x < -jerkThreshold){
-			lastEvent = d.getTime();
+			lastJerkEvent = d.getTime();
 			id = "image_" + ((currentImage + imageCount - 1)%imageCount);
 			eventFire(document.getElementById(id), 'click');
 			//alert("Clicked " + id);

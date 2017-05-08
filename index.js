@@ -60,6 +60,19 @@ io.on("connection", function(socket) {
 			setImageOnAllScreens();
         });
     });
+
+    socket.on("zoomLevel", function(level){
+        var remote = getRemote(socket.id)
+    	remote.screens.forEach(function (screenObj) {
+		if (screenObj.connected) {
+			var screen = getScreen(screenObj.id, "id");
+			// Attention: This could exceed the array index and 
+			// 	          must be handled on the client's side
+			screen.socket.emit("set-zoom", level);
+		}
+	});
+
+    });
 });
 
 /** Add a new remote to the system.
