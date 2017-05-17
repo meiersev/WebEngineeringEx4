@@ -29,7 +29,7 @@ function clearImage(){
 }
 
 function setZoom(level){
-    var scale_num = ((level + 2) / 4.0) + 0.5;
+    var scale_num = ((level) / 3.0) + 1;
     var img = document.querySelector('#image');
     img.style.transform = "scale(" + scale_num + ")";
 }

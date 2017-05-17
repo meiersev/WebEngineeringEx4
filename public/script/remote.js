@@ -144,12 +144,12 @@ function initialiseDeviceOrientation() {
 function deviceOrientationHandler(eventData){
 	var interval = 300;
 	var d = new Date();
-    var range =  (eventData.beta / 30) | 0;
-        if (range>= 2){
-            range = 2;
+    var range =  (eventData.beta / 15) | 0;
+        if (range>= 3){
+            range = 3;
         }
-        if (range <= -2){
-            range = -2;
+        if (range <= 0){
+            range = 0;
         }
 
 	if (lastOrientationEvent + interval < d.getTime() && 
@@ -158,7 +158,6 @@ function deviceOrientationHandler(eventData){
         lastOrientaionLevel = range;
 
         socket.emit("zoomLevel", range);
-        document.getElementById("doEvent").innerHTML = range;
     }
 }
 
